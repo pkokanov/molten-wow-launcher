@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 
 	// start the program up
 	CreateProcess(lpApplicationName,   // the path
-			NULL,        // Command line
+			NULL,           // Command line
 			NULL,           // Process handle not inheritable
 			NULL,           // Thread handle not inheritable
 			FALSE,          // Set handle inheritance to FALSE
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     // Close process and thread handles.
 	HWND wow;
 
-	    //Get the handle of the Notepad window.
+	// Get the handle of the WoW window.
 	wow = FindWindow("World of Warcraft", NULL );
 	if( wow == NULL )
 		return 0;
