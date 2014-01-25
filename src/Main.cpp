@@ -6,10 +6,13 @@
  */
 
 #include <string>
+#include <iostream>
 #include <Windows.h>
 
-int main(int argc, char* argv[])
-{
+int GetVirtualKeyCode(char ch);
+void GenerateKey(int vk , BOOL bExtended);
+
+int main(int argc, char* argv[]) {
 
 	std::string string = "D:\\Games\\HUHUE\\WoW.exe";
 	LPCSTR lpApplicationName = string.c_str();
@@ -33,18 +36,58 @@ int main(int argc, char* argv[])
 			&si,            // Pointer to STARTUPINFO structure
 			&pi 	        // Pointer to PROCESS_INFORMATION structure
 			);
-    // Close process and thread handles.
 	HWND wow;
 
-	// Get the handle of the WoW window.
-	wow = FindWindow("World of Warcraft", NULL );
-	if( wow == NULL )
+	Sleep(10000);
+	if(argc<2)
+	{
+		std::cout << "Not enough arguments";
 		return 0;
+	}
+	std::cout << argv[1];
+	for(int i=0; argv[1][i]!='\0'; i++)
+	{
+		int vCode = GetVirtualKeyCode(argv[1][i]);
+		GenerateKey(vCode, FALSE);
+		Sleep(1000);
+	}
+	GenerateKey(VK_RETURN, TRUE);
+	// Close process and thread handles.12
 
-	if( !SetForegroundWindow( wow ) )
-	        return 0;
-
-    CloseHandle( pi.hProcess );
-    CloseHandle( pi.hThread );
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
 }
 
+void GenerateKey(int vk, BOOL bExtended) {
+	KEYBDINPUT kb = { 0 };
+	INPUT Input = { 0 };
+	// generate down
+	if (bExtended)
+		kb.dwFlags = KEYEVENTF_EXTENDEDKEY;
+	kb.wVk = vk;
+	Input.type = INPUT_KEYBOARD;
+
+	Input.ki = kb;
+	::SendInput(1, &Input, sizeof(Input));
+
+	// generate up
+	::ZeroMemory(&kb,sizeof(KEYBDINPUT));
+	::ZeroMemory(&Input,sizeof(INPUT));
+	kb.dwFlags = KEYEVENTF_KEYUP;
+	if (bExtended)
+		kb.dwFlags |= KEYEVENTF_EXTENDEDKEY;
+
+	kb.wVk = vk;
+	Input.type = INPUT_KEYBOARD;
+	Input.ki = kb;
+	::SendInput(1, &Input, sizeof(Input));
+}
+
+int GetVirtualKeyCode(char ch)
+{
+	if(ch>=65 && ch<=90)
+		GenerateKey(VK_CAPITAL, TRUE);
+	else if(ch>=97 && ch<=122)
+		ch-=32;
+	return ch;
+}
